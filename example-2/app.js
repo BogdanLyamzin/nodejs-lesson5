@@ -1,24 +1,33 @@
-const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
-const {MongoClient} = require("mongodb");
+const {ObjectID, MongoClient} = require("mongodb");
 
-const app = express();
-const dbURI = process.env.DB_HOST;
+async function run(){
+    const DB_HOST = process.env.DB_HOST;
 
-const port = process.env.PORT || 3000;
+    const client = await new MongoClient(DB_HOST, {
+        useUnifiedTopology: true
+    }).connect();
 
-async function run (){
-    const client = await new MongoClient(dbURI, { useUnifiedTopology: true }).connect();
     try {
-        const result = await client.db("jobseek").collection("admins").find().toArray();
-        console.log(result)
+        // const results = await client.db("books_shop").collection("authors").find().toArray();
+        // const {ops: [newAuthor]} = await client.db("books_shop").collection("authors").insertOne({name: "Alex"});
+        /*
+        res.json({
+            status: "success",
+            code: 201,
+            data: newAuthor
+        })
+        */
+       // const {id} = req.params;
+       const objectId = new ObjectID("6053a696e9848a3cdc397e85");
+       const {value: updateAuthor} = await client.db("books_shop").collection("authors").findOneAndUpdate({_id: objectId },{$set: {name: "Anna"}}, {returnOriginal: false});
+       console.log(updateAuthor);
     }
-    catch(err){
+    catch(err) {
+        console.log(err)
+    }
 
-    }
 }
 
 run();
-
-app.listen(port);
